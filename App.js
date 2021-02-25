@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,6 +14,7 @@ import {
   View,
   Text,
   StatusBar,
+  Platform,
 } from 'react-native';
 
 import {
@@ -23,8 +24,23 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import PushIOManager from 'react-native-pushiomanager';
 
 const App: () => React$Node = () => {
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      PushIOManager.registerApp(true, (error, response) => {
+        debugger;
+      });
+    } else {
+      PushIOManager.registerForAllRemoteNotificationTypes((error, response) => {
+        PushIOManager.registerApp(true, (error, response) => {
+          debugger;
+        });
+      });
+    }
+  }, []);
+
   return (
     <>
       <StatusBar barStyle="dark-content" />

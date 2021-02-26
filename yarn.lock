@@ -5444,7 +5444,7 @@ react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
 
 "react-native-pushiomanager@https://github.com/oracle/pushiomanager-react-native.git":
   version "6.47.0"
-  resolved "https://github.com/oracle/pushiomanager-react-native.git#5f8b968677b9cbe419e642c22bbb4a5c119437a9"
+  resolved "https://github.com/oracle/pushiomanager-react-native.git#87d25316e4162141d2546d8c486ac17eae19cce2"
   dependencies:
     invariant "^2.2.4"
 

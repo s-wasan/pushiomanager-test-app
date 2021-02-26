@@ -28,17 +28,23 @@ import PushIOManager from 'react-native-pushiomanager';
 
 const App: () => React$Node = () => {
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      PushIOManager.registerApp(true, (error, response) => {
-        debugger;
-      });
-    } else {
-      PushIOManager.registerForAllRemoteNotificationTypes((error, response) => {
-        PushIOManager.registerApp(true, (error, response) => {
-          debugger;
-        });
-      });
-    }
+    PushIOManager.configure('pushio_config.json', (error, response) => {
+      if (response === 'success') {
+        if (Platform.OS === 'android') {
+          PushIOManager.registerApp(true, (error, response) => {
+            debugger;
+          });
+        } else {
+          PushIOManager.registerForAllRemoteNotificationTypes(
+            (error, response) => {
+              PushIOManager.registerApp(true, (error, response) => {
+                debugger;
+              });
+            },
+          );
+        }
+      }
+    });
   }, []);
 
   return (

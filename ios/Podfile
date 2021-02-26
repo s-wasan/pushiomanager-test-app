@@ -5,6 +5,7 @@ platform :ios, '10.0'
 
 target 'pushapp' do
   config = use_native_modules!
+  pod 'PushIOManager', :path => './PushIOManager'	
 
   use_react_native!(:path => config["reactNativePath"])
 
@@ -19,7 +20,6 @@ target 'pushapp' do
   # you should disable these next few lines.
   use_flipper!
 
-  pod 'PushIOManager', :path => './PushIOManager.framework'	
 
   post_install do |installer|
     flipper_post_install(installer)

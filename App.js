@@ -6,46 +6,74 @@
  * @flow strict-local
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
   ScrollView,
-  View,
   Text,
   StatusBar,
   Platform,
+  TouchableOpacity,
+  TextInput,
+  ToastAndroid,
+  Alert,
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import PushIOManager from 'react-native-pushiomanager';
 
 const App: () => React$Node = () => {
+  const [canRegisterUser, setCanRegisterUser] = useState(false);
+  const [userId, setUserId] = useState('');
+
   useEffect(() => {
-    PushIOManager.configure('pushio_config.json', (error, response) => {
-      if (response === 'success') {
-        if (Platform.OS === 'android') {
-          PushIOManager.registerApp(true, (error, response) => {
-            debugger;
-          });
+    PushIOManager.configure(
+      'pushio_config.json',
+      (configureError, configureResponse) => {
+        if (configureResponse === 'success') {
+          if (Platform.OS === 'android') {
+            PushIOManager.registerApp(
+              true,
+              (registerError, registerResponse) => {
+                if (registerResponse === 'success') {
+                  setCanRegisterUser(true);
+                } else {
+                  setCanRegisterUser(false);
+                }
+              },
+            );
+          } else {
+            PushIOManager.registerForAllRemoteNotificationTypes(
+              (error, response) => {
+                PushIOManager.registerApp(true, (error, response) => {});
+              },
+            );
+          }
         } else {
-          PushIOManager.registerForAllRemoteNotificationTypes(
-            (error, response) => {
-              PushIOManager.registerApp(true, (error, response) => {
-                debugger;
-              });
-            },
-          );
+          setCanRegisterUser(false);
         }
-      }
-    });
+      },
+    );
   }, []);
+
+  const registerUser = () => {
+    if (!canRegisterUser) {
+      Alert.alert('Unable to register user.');
+      return;
+    }
+    if (userId) {
+      PushIOManager.registerUserId(userId);
+      ToastAndroid.show('User ID registered', ToastAndroid.SHORT);
+    } else {
+      Alert.alert('Please informe the user ID first.');
+    }
+  };
+
+  const unregisterUser = () => {
+    PushIOManager.unregisterUserId();
+    ToastAndroid.show('User ID unregistered', ToastAndroid.SHORT);
+  };
 
   return (
     <>
@@ -54,40 +82,35 @@ const App: () => React$Node = () => {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="User ID for registration"
+            value={userId}
+            onChangeText={(text) => {
+              setUserId(text);
+            }}
+          />
+
+          <TouchableOpacity
+            onPress={registerUser}
+            style={{
+              ...styles.button,
+              ...styles.registerButton,
+            }}>
+            <Text style={{textAlign: 'center', color: 'white'}}>
+              Register User
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={unregisterUser}
+            style={{
+              ...styles.button,
+              ...styles.unregisterButton,
+            }}>
+            <Text style={{textAlign: 'center', color: 'white'}}>
+              Unregister User
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     </>
@@ -98,38 +121,20 @@ const styles = StyleSheet.create({
   scrollView: {
     backgroundColor: Colors.lighter,
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  button: {
+    height: 58,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 24,
+    marginTop: 16,
   },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+  registerButton: {backgroundColor: '#7cb342'},
+  unregisterButton: {backgroundColor: '#e53935'},
+  input: {
+    borderColor: '#333',
+    borderWidth: 0.3,
+    padding: 8,
+    margin: 24,
   },
 });
 

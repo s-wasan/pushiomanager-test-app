@@ -11,7 +11,9 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
+
 #import <PushIOManager/PushIOManagerAll.h>
+#import <UserNotifications/UserNotifications.h>
 
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
@@ -23,6 +25,9 @@ static void InitializeFlipper(UIApplication *application) {
   [client start];
 }
 #endif
+
+@interface AppDelegate()<UNUserNotificationCenterDelegate>
+@end
 
 @implementation AppDelegate
 
@@ -44,6 +49,12 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
+  [UNUserNotificationCenter currentNotificationCenter].delegate= self;
+  [PushIOManager sharedInstance].notificationPresentationOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
+
+  [[PushIOManager sharedInstance] didFinishLaunchingWithOptions:launchOptions];
+
   return YES;
 }
 

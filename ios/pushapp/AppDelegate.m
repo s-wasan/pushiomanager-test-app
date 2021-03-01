@@ -11,7 +11,7 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-#import <Pus>
+#import <PushIOManager/PushIOManagerAll.h>
 
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
@@ -95,8 +95,5 @@ withCompletionHandler:completionHandler];
     [[PushIOManager sharedInstance] userNotificationCenter:center willPresentNotification:notification
 withCompletionHandler:completionHandler];
 }
-
-@end
-
 
 @end
